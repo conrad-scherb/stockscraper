@@ -1,3 +1,4 @@
 auth.json
+__pycache__/
 .vscode/
 data/

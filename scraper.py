@@ -3,10 +3,12 @@ import requests, json, datetime, os, time, sqlManager
 def pullStockData(ticker, token, apiMode):
     url = "https://" + apiMode + ".iexapis.com/stable/tops?token=" + token + "&symbols=" + ticker
     resp = requests.get(url)
-    #if resp.json() == []: 
-    #    print("That is not a valid ticker!")
-    #    return 0
-    return resp.json()
+    return resp.json()[0] #.json() chucks the dict into a list so extract list element as dict
+
+def recordJsonToSQL(ticker, data):
+    currTime = str(datetime.datetime.now())[0:19]
+    price = data['lastSalePrice']
+    sqlManager.insertStock(ticker, currTime, price)
 
 with open(os.path.relpath('auth.json')) as json_file:
     auths = json.load(json_file)
@@ -22,24 +24,19 @@ elif mode == "REAL":
     apiMode = "cloud"
 
 data = 0
-ticker = ""
-while data == 0:
-    print("Enter a stock ticker symbol to scrape from: ")
-    ticker = input().lower()
-    data = pullStockData(ticker, token, apiMode)
-
-
-filepath = os.path.relpath("data/" + ticker + ".json")
+tickers = []
 
 while True:
-    data = pullStockData(ticker, token, apiMode)
-    currTime = str(datetime.datetime.now())[0:19]
+    print("Enter a stock ticker symbol to scrape from (press X to exit): ")
+    newTicker = input().lower()
+    print(newTicker)
+    if newTicker == "x":
+        print("got here")
+        break
+    tickers.append(newTicker)
 
-    with open(filepath) as json_file:
-        newData = json.load(json_file)
-
-    newData[currTime] = data
-    with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(newData, f, ensure_ascii=False, indent=4)
-    
-    time.sleep(1)
+while True:
+    for tick in tickers:
+        data = pullStockData(tick, token, apiMode)
+        recordJsonToSQL(tick, data)
+    time.sleep(0.5)

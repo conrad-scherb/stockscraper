@@ -27,6 +27,7 @@ def insertStock(ticker, currTime, currPrice):
                 sqlScript = sqliteFile.read()
                 cursor.executescript(sqlScript)
                 print("DB dosen't exist - it was created.")
+                # Recall the function (should no longer error, and will write to table)
                 insertStock(ticker, currTime, currPrice)
         else: 
             print("Failed to insert Python variable into sqlite table", error)
@@ -35,5 +36,3 @@ def insertStock(ticker, currTime, currPrice):
         if (sqliteConnection):
             sqliteConnection.close()
             print("The SQLite connection is closed")
-
-#insertStock('aapl', "2", "1")
