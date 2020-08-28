@@ -1,4 +1,4 @@
-import requests, json, datetime, os, time
+import requests, json, datetime, os, time, sqlManager
 
 def pullStockData(ticker, token, apiMode):
     url = "https://" + apiMode + ".iexapis.com/stable/tops?token=" + token + "&symbols=" + ticker
